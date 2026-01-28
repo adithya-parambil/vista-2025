@@ -7,7 +7,7 @@
 export const MAGAZINE_CONFIG = {
   // PDF source - GitHub Releases URL
   // Replace this URL when publishing a new edition
-  PDF_URL: 'https://github.com/nickklos10/nickklos10/releases/download/v1.0/magazine.pdf',
+  PDF_URL: 'https://github.com/adithya-parambil/vista-2025/releases/download/v1.0/Vista.Anantam.pdf',
   
   // Logo path - stored in public folder
   LOGO_PATH: '/logo.png',
