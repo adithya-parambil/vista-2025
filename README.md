@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
+# Digital Magazine Flipbook
 
-## Project info
+A premium, production-grade digital magazine experience built with React. Features a realistic page-flip animation, intelligent lazy loading, and elegant UI.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- 📖 **Realistic Flipbook** - Smooth page-turning animations with shadows and depth
+- 🚀 **Lazy Loading** - Intelligent page streaming for optimal performance
+- 📱 **Responsive** - Desktop double-page spread, mobile single-page view
+- ⌨️ **Full Navigation** - Mouse, touch, keyboard, and direct page jump
+- 🎨 **Premium Design** - Dark theme with gold accents
+- ♿ **Accessible** - ARIA labels, keyboard navigation, screen reader support
+- 📥 **Download** - One-click PDF download
 
-There are several ways of editing your application.
+## Quick Start
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Edit `src/config/magazine.ts` to customize:
 
-**Use GitHub Codespaces**
+```typescript
+export const MAGAZINE_CONFIG = {
+  // PDF source - replace with your GitHub Releases URL
+  PDF_URL: 'https://github.com/your-repo/releases/download/v1.0/magazine.pdf',
+  
+  // Logo stored in public folder
+  LOGO_PATH: '/logo.png',
+  
+  // Branding
+  BRAND_NAME: 'Your Magazine',
+  TAGLINE: 'presents',
+};
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Replacing the PDF
 
-## What technologies are used for this project?
+1. Upload your PDF to GitHub Releases
+2. Copy the direct download URL
+3. Update `PDF_URL` in `src/config/magazine.ts`
 
-This project is built with:
+## Replacing the Logo
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Add your logo to the `/public` folder (e.g., `/public/logo.png`)
+2. Update `LOGO_PATH` in `src/config/magazine.ts`
+3. Supported formats: PNG, SVG, WebP
 
-## How can I deploy this project?
+## Keyboard Shortcuts
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+| Key | Action |
+|-----|--------|
+| ← / → | Previous / Next page |
+| Home | Go to first page |
+| End | Go to last page |
+| F | Toggle fullscreen |
+| Space | Next page |
 
-## Can I connect a custom domain to my Lovable project?
+## Deployment
 
-Yes, you can!
+Deploy to Vercel or Netlify with `npm run build`.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Tech Stack
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- React 18 + TypeScript
+- react-pdf (PDF.js)
+- Framer Motion (animations)
+- Zustand (state management)
+- Tailwind CSS (styling)
