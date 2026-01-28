@@ -1,0 +1,305 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Magazine Premium Dark Theme */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 43 45% 60%;
+    --primary-foreground: 0 0% 4%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 43 45% 60%;
+    --accent-foreground: 0 0% 4%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 43 45% 60%;
+
+    --radius: 0.5rem;
+
+    /* Magazine-specific tokens */
+    --magazine-bg: 0 0% 4%;
+    --magazine-surface: 0 0% 8%;
+    --magazine-page: 0 0% 98%;
+    --magazine-shadow: 0 0% 0%;
+    --magazine-gold: 43 45% 60%;
+    --magazine-gold-dim: 43 35% 45%;
+    --magazine-text-primary: 0 0% 96%;
+    --magazine-text-secondary: 0 0% 70%;
+    --magazine-text-muted: 0 0% 50%;
+
+    /* Animation durations */
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+    --duration-page-flip: 600ms;
+
+    /* Easing functions */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
+    --ease-page-flip: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Shadows */
+    --shadow-page: 0 25px 50px -12px hsl(var(--magazine-shadow) / 0.5);
+    --shadow-page-flip: -10px 0 40px -5px hsl(var(--magazine-shadow) / 0.4);
+    --shadow-controls: 0 4px 20px -4px hsl(var(--magazine-shadow) / 0.6);
+    --shadow-ambient: 0 0 100px 20px hsl(var(--magazine-shadow) / 0.3);
+  }
+
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+  }
+
+  /* Custom scrollbar for magazine controls */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* Magazine intro animations */
+  .intro-logo {
+    animation: logoReveal 1.2s var(--ease-out-expo) forwards;
+  }
+
+  .intro-text {
+    animation: textFadeIn 0.8s var(--ease-out-expo) 0.6s forwards;
+    opacity: 0;
+  }
+
+  .intro-progress {
+    animation: progressFadeIn 0.5s var(--ease-out-expo) 1s forwards;
+    opacity: 0;
+  }
+
+  /* Page flip effect */
+  .page-flip {
+    transform-style: preserve-3d;
+    perspective: 2000px;
+  }
+
+  .page-front,
+  .page-back {
+    backface-visibility: hidden;
+    transform-origin: left center;
+  }
+
+  .page-back {
+    transform: rotateY(180deg);
+  }
+
+  /* Controls fade */
+  .controls-container {
+    transition: opacity var(--duration-normal) var(--ease-out-expo);
+  }
+
+  .controls-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .controls-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Page loading skeleton */
+  .page-skeleton {
+    @apply bg-gradient-to-r from-muted via-muted-foreground/10 to-muted;
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Control button styles */
+  .control-btn {
+    @apply flex items-center justify-center p-3 rounded-lg transition-all duration-200;
+    @apply bg-secondary/80 backdrop-blur-md text-foreground;
+    @apply hover:bg-secondary hover:text-primary;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/50;
+    @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-secondary/80;
+  }
+
+  .control-btn-primary {
+    @apply control-btn bg-primary/20 text-primary;
+    @apply hover:bg-primary/30;
+  }
+
+  /* Magazine page container */
+  .magazine-page {
+    @apply bg-white rounded-sm overflow-hidden;
+    box-shadow: var(--shadow-page);
+  }
+
+  /* Fullscreen styles */
+  .magazine-fullscreen {
+    @apply fixed inset-0 z-50 bg-background;
+  }
+}
+
+@layer utilities {
+  /* GPU-accelerated transforms */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+
+  /* Text selection disabled for magazine pages */
+  .no-select {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Touch-friendly targets */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Keyframe animations */
+@keyframes logoReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes textFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progressFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pageFlipIn {
+  0% {
+    transform: perspective(2000px) rotateY(-90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: perspective(2000px) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes pageFlipOut {
+  0% {
+    transform: perspective(2000px) rotateY(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(2000px) rotateY(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* React-PDF specific styles */
+.react-pdf__Page {
+  @apply flex items-center justify-center;
+}
+
+.react-pdf__Page__canvas {
+  @apply max-w-full h-auto !important;
+}
+
+.react-pdf__Page__textContent,
+.react-pdf__Page__annotations {
+  display: none !important;
+}
