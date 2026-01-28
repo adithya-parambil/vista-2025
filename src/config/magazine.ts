@@ -5,10 +5,9 @@
  */
 
 export const MAGAZINE_CONFIG = {
-  // PDF source - GitHub Releases URL with CORS proxy
-  // Replace this URL when publishing a new edition
-  // Using cors-anywhere proxy to bypass CORS restrictions
-  PDF_URL: 'https://vista-2025-nu.vercel.app/Vista.Anantam.pdf',
+  // PDF source - served from public folder
+  // Replace this path when publishing a new edition
+  PDF_URL: '/Vista.Anantam.pdf',
   
   // Logo path - stored in public folder
   LOGO_PATH: '/logo.png',
