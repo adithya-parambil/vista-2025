@@ -13,6 +13,8 @@ export interface MagazineState {
   // Cached pages tracking
   cachedPages: Set<number>;
   loadingPages: Set<number>;
+  // Page cache with rendered content
+  pageCache: Map<number, HTMLCanvasElement>;
   
   // UI state
   isIntroComplete: boolean;
@@ -40,6 +42,9 @@ export interface MagazineState {
   removeCachedPage: (page: number) => void;
   addLoadingPage: (page: number) => void;
   removeLoadingPage: (page: number) => void;
+  setCachedPage: (page: number, canvas: HTMLCanvasElement) => void;
+  getCachedPage: (page: number) => HTMLCanvasElement | undefined;
+  clearPageCache: () => void;
   
   completeIntro: () => void;
   toggleFullscreen: () => void;
@@ -63,6 +68,7 @@ const initialState = {
   error: null,
   cachedPages: new Set<number>(),
   loadingPages: new Set<number>(),
+  pageCache: new Map<number, HTMLCanvasElement>(),
   isIntroComplete: false,
   isFullscreen: false,
   zoomLevel: 1,
@@ -175,7 +181,28 @@ export const useMagazineStore = create<MagazineState>((set, get) => ({
   },
   
   setViewMode: (mode) => set({ viewMode: mode }),
-  
+
+  setCachedPage: (page, canvas) => {
+    const { pageCache } = get();
+    const newCache = new Map(pageCache);
+
+    // If cache is full, remove oldest entries (simple FIFO)
+    if (newCache.size >= MAGAZINE_CONFIG.MAX_CACHED_PAGES) {
+      const keysToDelete = Array.from(newCache.keys()).slice(0, newCache.size - MAGAZINE_CONFIG.MAX_CACHED_PAGES + 1);
+      keysToDelete.forEach(key => newCache.delete(key));
+    }
+
+    newCache.set(page, canvas);
+    set({ pageCache: newCache });
+  },
+
+  getCachedPage: (page) => {
+    const { pageCache } = get();
+    return pageCache.get(page);
+  },
+
+  clearPageCache: () => set({ pageCache: new Map() }),
+
   reset: () => set(initialState),
 }));
 

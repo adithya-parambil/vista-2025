@@ -1,4 +1,4 @@
-import { memo, useEffect, useState, useCallback } from 'react';
+import { memo, useEffect, useState, useCallback, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { motion } from 'framer-motion';
 import { useMagazineStore } from '@/store/magazineStore';
@@ -29,7 +29,8 @@ export const PageRenderer = memo(function PageRenderer({
 }: PageRendererProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const { addCachedPage, addLoadingPage, removeLoadingPage, isMobile, isTablet, pdfUrl } = useMagazineStore();
+  const [cachedCanvas, setCachedCanvas] = useState<HTMLCanvasElement | null>(null);
+  const { addCachedPage, addLoadingPage, removeLoadingPage, isMobile, isTablet, pdfUrl, getCachedPage, setCachedPage } = useMagazineStore();
 
   // Calculate scale based on device
   const getScale = useCallback(() => {
@@ -38,11 +39,21 @@ export const PageRenderer = memo(function PageRenderer({
     return MAGAZINE_CONFIG.DESKTOP_SCALE;
   }, [isMobile, isTablet]);
 
+  // Check for cached page on mount
   useEffect(() => {
-    if (isVisible && !isLoaded) {
+    const cached = getCachedPage(pageNumber);
+    if (cached) {
+      setCachedCanvas(cached);
+      setIsLoaded(true);
+      onLoadSuccess?.();
+    }
+  }, [pageNumber, getCachedPage, onLoadSuccess]);
+
+  useEffect(() => {
+    if (isVisible && !isLoaded && !cachedCanvas) {
       addLoadingPage(pageNumber);
     }
-  }, [isVisible, isLoaded, pageNumber, addLoadingPage]);
+  }, [isVisible, isLoaded, cachedCanvas, pageNumber, addLoadingPage]);
 
   const handleLoadSuccess = useCallback(() => {
     setIsLoaded(true);
@@ -51,6 +62,16 @@ export const PageRenderer = memo(function PageRenderer({
     addCachedPage(pageNumber);
     onLoadSuccess?.();
   }, [pageNumber, removeLoadingPage, addCachedPage, onLoadSuccess]);
+
+  const handleRenderSuccess = useCallback(() => {
+    // Capture the rendered canvas and store it in cache
+    const canvas = document.querySelector(`.magazine-page-content canvas`) as HTMLCanvasElement;
+    if (canvas) {
+      const clonedCanvas = canvas.cloneNode(true) as HTMLCanvasElement;
+      setCachedPage(pageNumber, clonedCanvas);
+      setCachedCanvas(clonedCanvas);
+    }
+  }, [pageNumber, setCachedPage]);
 
   const handleLoadError = useCallback((error: Error) => {
     setHasError(true);
@@ -86,25 +107,46 @@ export const PageRenderer = memo(function PageRenderer({
         </div>
       )}
 
-      {/* PDF Page */}
-      <Document
-        file={pdfUrl}
-        loading={null}
-        error={null}
-        onLoadError={(error) => handleLoadError(error as Error)}
-      >
-        <Page
-          pageNumber={pageNumber}
-          width={width}
-          scale={getScale()}
-          renderTextLayer={false}
-          renderAnnotationLayer={false}
-          loading={null}
-          onLoadSuccess={handleLoadSuccess}
-          onRenderError={(error) => handleLoadError(error as Error)}
+      {/* Cached Canvas */}
+      {cachedCanvas && (
+        <canvas
+          ref={(el) => {
+            if (el && cachedCanvas) {
+              const ctx = el.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(cachedCanvas, 0, 0);
+              }
+            }
+          }}
+          width={cachedCanvas.width}
+          height={cachedCanvas.height}
           className="magazine-page-content"
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
         />
-      </Document>
+      )}
+
+      {/* PDF Page - only render if not cached */}
+      {!cachedCanvas && (
+        <Document
+          file={pdfUrl}
+          loading={null}
+          error={null}
+          onLoadError={(error) => handleLoadError(error as Error)}
+        >
+          <Page
+            pageNumber={pageNumber}
+            width={width}
+            scale={getScale()}
+            renderTextLayer={false}
+            renderAnnotationLayer={false}
+            loading={null}
+            onLoadSuccess={handleLoadSuccess}
+            onRenderSuccess={handleRenderSuccess}
+            onRenderError={(error) => handleLoadError(error as Error)}
+            className="magazine-page-content"
+          />
+        </Document>
+      )}
 
       {/* Cover depth effect */}
       {isCover && isLoaded && (
