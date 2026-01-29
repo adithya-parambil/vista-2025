@@ -1,27 +1,26 @@
 import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Document, pdfjs } from 'react-pdf';
 import { IntroScreen } from './IntroScreen';
 import { FlipbookViewer } from './FlipbookViewer';
 import { ErrorBoundary } from './ErrorBoundary';
 import { useMagazineStore } from '@/store/magazineStore';
+import { usePdfCache } from '@/hooks/usePdfCache';
 import { MAGAZINE_CONFIG } from '@/config/magazine';
-
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export function Magazine() {
   const [showIntro, setShowIntro] = useState(true);
-  const [pdfReady, setPdfReady] = useState(false);
   const [introMinTimePassed, setIntroMinTimePassed] = useState(false);
 
   const { 
-    pdfUrl, 
-    setTotalPages, 
-    setLoadingProgress,
     completeIntro,
     isIntroComplete 
   } = useMagazineStore();
+
+  // Download and cache the PDF
+  const { cachedUrl, isDownloading, downloadProgress, error: cacheError } = usePdfCache();
+  
+  // PDF is ready when cached
+  const pdfReady = !!cachedUrl;
 
   // Minimum intro duration
   useEffect(() => {
@@ -31,21 +30,6 @@ export function Magazine() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Handle PDF preload success
-  const handlePreloadSuccess = useCallback(({ numPages }: { numPages: number }) => {
-    setTotalPages(numPages);
-    setLoadingProgress(50);
-    setPdfReady(true);
-  }, [setTotalPages, setLoadingProgress]);
-
-  // Handle PDF preload progress
-  const handlePreloadProgress = useCallback(({ loaded, total }: { loaded: number; total: number }) => {
-    if (total > 0) {
-      const progress = Math.round((loaded / total) * 50);
-      setLoadingProgress(progress);
-    }
-  }, [setLoadingProgress]);
 
   // Complete intro sequence
   const handleIntroComplete = useCallback(() => {
@@ -65,24 +49,14 @@ export function Magazine() {
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-background">
-        {/* Preload PDF during intro */}
-        {showIntro && (
-          <div className="hidden">
-            <Document
-              file={pdfUrl}
-              onLoadSuccess={handlePreloadSuccess}
-              onLoadProgress={handlePreloadProgress}
-              loading={null}
-            />
-          </div>
-        )}
-
         {/* Intro Screen */}
         <AnimatePresence mode="wait">
           {showIntro && (
             <IntroScreen
               onComplete={handleIntroComplete}
               isReady={isReady}
+              downloadProgress={downloadProgress}
+              isDownloading={isDownloading}
             />
           )}
         </AnimatePresence>
