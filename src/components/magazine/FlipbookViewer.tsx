@@ -25,6 +25,7 @@ export function FlipbookViewer({ className = '' }: FlipbookViewerProps) {
   const [flipDirection, setFlipDirection] = useState<'left' | 'right'>('right');
 
   const {
+    cachedPdfUrl,
     pdfUrl,
     currentPage,
     totalPages,
@@ -42,6 +43,9 @@ export function FlipbookViewer({ className = '' }: FlipbookViewerProps) {
     setViewMode,
     isFullscreen,
   } = useMagazineStore();
+
+  // Use cached PDF if available
+  const effectivePdfUrl = cachedPdfUrl || pdfUrl;
 
   const deviceInfo = useDeviceDetect();
   const { controlsVisible } = useControlsVisibility();
@@ -271,7 +275,7 @@ export function FlipbookViewer({ className = '' }: FlipbookViewerProps) {
       
       {/* Hidden PDF Document for loading */}
       <Document
-        file={pdfUrl}
+        file={effectivePdfUrl}
         onLoadSuccess={handleDocumentLoad}
         onLoadError={handleDocumentError}
         loading={null}

@@ -29,7 +29,23 @@ export const PageRenderer = memo(function PageRenderer({
 }: PageRendererProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const { addCachedPage, addLoadingPage, removeLoadingPage, isMobile, isTablet, pdfUrl } = useMagazineStore();
+  const { 
+    addCachedPage, 
+    addLoadingPage, 
+    removeLoadingPage, 
+    isMobile, 
+    isTablet, 
+    cachedPdfUrl, 
+    pdfUrl,
+    markPageRendered,
+    isPageRendered
+  } = useMagazineStore();
+
+  // Use cached PDF URL if available, otherwise use original URL
+  const effectivePdfUrl = cachedPdfUrl || pdfUrl;
+
+  // Check if this page was already rendered (for instant display on revisit)
+  const wasRendered = isPageRendered(pageNumber);
 
   // Calculate scale based on device
   const getScale = useCallback(() => {
@@ -49,8 +65,9 @@ export const PageRenderer = memo(function PageRenderer({
     setHasError(false);
     removeLoadingPage(pageNumber);
     addCachedPage(pageNumber);
+    markPageRendered(pageNumber);
     onLoadSuccess?.();
-  }, [pageNumber, removeLoadingPage, addCachedPage, onLoadSuccess]);
+  }, [pageNumber, removeLoadingPage, addCachedPage, markPageRendered, onLoadSuccess]);
 
   const handleLoadError = useCallback((error: Error) => {
     setHasError(true);
@@ -64,9 +81,9 @@ export const PageRenderer = memo(function PageRenderer({
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={{ opacity: wasRendered ? 1 : 0 }}
       animate={{ opacity: isLoaded ? 1 : 0.5 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: wasRendered ? 0 : 0.3 }}
       className={`relative overflow-hidden bg-magazine-page ${
         isCover ? 'rounded-r-sm shadow-page' : 'rounded-sm shadow-page'
       }`}
@@ -88,7 +105,7 @@ export const PageRenderer = memo(function PageRenderer({
 
       {/* PDF Page */}
       <Document
-        file={pdfUrl}
+        file={effectivePdfUrl}
         loading={null}
         error={null}
         onLoadError={(error) => handleLoadError(error as Error)}

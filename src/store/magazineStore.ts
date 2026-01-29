@@ -4,15 +4,17 @@ import { MAGAZINE_CONFIG } from '@/config/magazine';
 export interface MagazineState {
   // PDF state
   pdfUrl: string;
+  cachedPdfUrl: string | null; // Blob URL for cached PDF
   totalPages: number;
   currentPage: number;
   isLoading: boolean;
   loadingProgress: number;
   error: string | null;
   
-  // Cached pages tracking
+  // Cached pages tracking - now we keep ALL rendered pages
   cachedPages: Set<number>;
   loadingPages: Set<number>;
+  renderedPageData: Map<number, boolean>; // Track which pages have been rendered
   
   // UI state
   isIntroComplete: boolean;
@@ -36,10 +38,13 @@ export interface MagazineState {
   setLoadingProgress: (progress: number) => void;
   setError: (error: string | null) => void;
   
+  setCachedPdfUrl: (url: string) => void;
   addCachedPage: (page: number) => void;
   removeCachedPage: (page: number) => void;
   addLoadingPage: (page: number) => void;
   removeLoadingPage: (page: number) => void;
+  markPageRendered: (page: number) => void;
+  isPageRendered: (page: number) => boolean;
   
   completeIntro: () => void;
   toggleFullscreen: () => void;
@@ -56,6 +61,7 @@ export interface MagazineState {
 
 const initialState = {
   pdfUrl: MAGAZINE_CONFIG.PDF_URL,
+  cachedPdfUrl: null as string | null,
   totalPages: 0,
   currentPage: 1,
   isLoading: true,
@@ -63,6 +69,7 @@ const initialState = {
   error: null,
   cachedPages: new Set<number>(),
   loadingPages: new Set<number>(),
+  renderedPageData: new Map<number, boolean>(),
   isIntroComplete: false,
   isFullscreen: false,
   zoomLevel: 1,
@@ -108,6 +115,8 @@ export const useMagazineStore = create<MagazineState>((set, get) => ({
   setLoadingProgress: (progress) => set({ loadingProgress: progress }),
   setError: (error) => set({ error, isLoading: false }),
   
+  setCachedPdfUrl: (url) => set({ cachedPdfUrl: url }),
+  
   addCachedPage: (page) => {
     const { cachedPages } = get();
     const newCached = new Set(cachedPages);
@@ -134,6 +143,18 @@ export const useMagazineStore = create<MagazineState>((set, get) => ({
     const newLoading = new Set(loadingPages);
     newLoading.delete(page);
     set({ loadingPages: newLoading });
+  },
+  
+  markPageRendered: (page) => {
+    const { renderedPageData } = get();
+    const newRendered = new Map(renderedPageData);
+    newRendered.set(page, true);
+    set({ renderedPageData: newRendered });
+  },
+  
+  isPageRendered: (page) => {
+    const { renderedPageData } = get();
+    return renderedPageData.has(page);
   },
   
   completeIntro: () => set({ isIntroComplete: true }),

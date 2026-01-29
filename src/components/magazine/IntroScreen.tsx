@@ -6,12 +6,13 @@ import { useMagazineStore } from '@/store/magazineStore';
 interface IntroScreenProps {
   onComplete: () => void;
   isReady: boolean;
+  downloadProgress?: number;
+  isDownloading?: boolean;
 }
 
-export function IntroScreen({ onComplete, isReady }: IntroScreenProps) {
+export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownloading = false }: IntroScreenProps) {
   const [showText, setShowText] = useState(false);
   const [progress, setProgress] = useState(0);
-  const { loadingProgress } = useMagazineStore();
   const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
@@ -46,8 +47,8 @@ export function IntroScreen({ onComplete, isReady }: IntroScreenProps) {
     }
   }, [isReady, progress, onComplete]);
 
-  // Use actual loading progress if available
-  const displayProgress = loadingProgress > 0 ? loadingProgress : progress;
+  // Use download progress for accurate display
+  const displayProgress = isDownloading ? downloadProgress : (isReady ? 100 : progress);
 
   return (
     <motion.div
@@ -122,7 +123,7 @@ export function IntroScreen({ onComplete, isReady }: IntroScreenProps) {
             transition={{ delay: 1.2 }}
             className="text-xs font-light tracking-wider text-muted-foreground"
           >
-            Preparing the Magazine…
+            {isDownloading ? 'Downloading Magazine…' : 'Preparing the Magazine…'}
           </motion.p>
         </motion.div>
       </div>
