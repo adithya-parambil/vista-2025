@@ -6,6 +6,7 @@ import { MAGAZINE_CONFIG } from '@/config/magazine';
 import { useDeviceDetect } from '@/hooks/useDeviceDetect';
 import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 import { useControlsVisibility } from '@/hooks/useControlsVisibility';
+import { usePageSound } from '@/hooks/usePageSound';
 import { PageRenderer } from './PageRenderer';
 import { Controls } from './Controls';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -49,6 +50,7 @@ export function FlipbookViewer({ className = '' }: FlipbookViewerProps) {
 
   const deviceInfo = useDeviceDetect();
   const { controlsVisible } = useControlsVisibility();
+  const { playPageTurn } = usePageSound();
   useKeyboardNavigation();
 
   // Update device type in store
@@ -184,23 +186,25 @@ export function FlipbookViewer({ className = '' }: FlipbookViewerProps) {
       if (currentPage < totalPages) {
         setFlipDirection('right');
         setIsFlipping(true);
+        playPageTurn();
         setTimeout(() => {
           goToNextPage();
           setIsFlipping(false);
-        }, 300);
+        }, 500);
       }
     } else if (info.offset.x > threshold && info.velocity.x > 0) {
       // Swipe right - previous page
       if (currentPage > 1) {
         setFlipDirection('left');
         setIsFlipping(true);
+        playPageTurn();
         setTimeout(() => {
           goToPrevPage();
           setIsFlipping(false);
-        }, 300);
+        }, 500);
       }
     }
-  }, [currentPage, totalPages, goToNextPage, goToPrevPage, isFlipping]);
+  }, [currentPage, totalPages, goToNextPage, goToPrevPage, isFlipping, playPageTurn]);
 
   // Retry handler
   const handleRetry = useCallback(() => {
@@ -220,19 +224,21 @@ export function FlipbookViewer({ className = '' }: FlipbookViewerProps) {
     if (clickX < halfWidth && currentPage > 1) {
       setFlipDirection('left');
       setIsFlipping(true);
+      playPageTurn();
       setTimeout(() => {
         goToPrevPage();
         setIsFlipping(false);
-      }, 300);
+      }, 500);
     } else if (clickX >= halfWidth && currentPage < totalPages) {
       setFlipDirection('right');
       setIsFlipping(true);
+      playPageTurn();
       setTimeout(() => {
         goToNextPage();
         setIsFlipping(false);
-      }, 300);
+      }, 500);
     }
-  }, [currentPage, totalPages, goToNextPage, goToPrevPage, isFlipping]);
+  }, [currentPage, totalPages, goToNextPage, goToPrevPage, isFlipping, playPageTurn]);
 
   // Error state
   if (error) {
@@ -320,51 +326,82 @@ export function FlipbookViewer({ className = '' }: FlipbookViewerProps) {
             
             {/* Pages */}
             <AnimatePresence mode="popLayout">
-              {displayPages.map((pageNum, index) => (
-                <motion.div
-                  key={pageNum}
-                  initial={{ 
-                    opacity: 0, 
-                    rotateY: flipDirection === 'right' ? -10 : 10,
-                    x: flipDirection === 'right' ? -20 : 20
-                  }}
-                  animate={{ 
-                    opacity: 1, 
-                    rotateY: 0,
-                    x: 0
-                  }}
-                  exit={{ 
-                    opacity: 0, 
-                    rotateY: flipDirection === 'right' ? 10 : -10,
-                    x: flipDirection === 'right' ? 20 : -20
-                  }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.4, 0, 0.2, 1],
-                  }}
-                  style={{
-                    perspective: '2000px',
-                    transformStyle: 'preserve-3d',
-                  }}
-                  className="relative"
-                >
-                  <PageRenderer
-                    pageNumber={pageNum}
-                    width={pageDimensions.width}
-                    height={pageDimensions.height}
-                    isVisible={true}
-                    isCover={pageNum === 1}
-                  />
-                  
-                  {/* Page shadow effect */}
-                  {viewMode === 'double' && index === 0 && displayPages.length === 2 && (
-                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/5 to-transparent pointer-events-none" />
-                  )}
-                  {viewMode === 'double' && index === 1 && (
-                    <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/10 to-transparent pointer-events-none" />
-                  )}
-                </motion.div>
-              ))}
+              {displayPages.map((pageNum, index) => {
+                const isLeftPage = index === 0 && displayPages.length === 2;
+                const isRightPage = index === 1 || displayPages.length === 1;
+                
+                return (
+                  <motion.div
+                    key={pageNum}
+                    className="relative page-curl-container"
+                    style={{
+                      perspective: 2000,
+                      transformStyle: 'preserve-3d',
+                      transformOrigin: isLeftPage ? 'right center' : 'left center',
+                    }}
+                    initial={{ 
+                      opacity: 0,
+                      rotateY: flipDirection === 'right' ? -90 : 90,
+                      scale: 0.9,
+                    }}
+                    animate={{ 
+                      opacity: 1,
+                      rotateY: 0,
+                      scale: 1,
+                    }}
+                    exit={{ 
+                      opacity: 0,
+                      rotateY: flipDirection === 'right' ? 90 : -90,
+                      scale: 0.9,
+                    }}
+                    transition={{
+                      duration: 0.5,
+                      ease: [0.25, 0.46, 0.45, 0.94], // Custom easing for realistic curl
+                    }}
+                  >
+                    <PageRenderer
+                      pageNumber={pageNum}
+                      width={pageDimensions.width}
+                      height={pageDimensions.height}
+                      isVisible={true}
+                      isCover={pageNum === 1}
+                    />
+                    
+                    {/* Dynamic curl shadow - appears during flip */}
+                    <motion.div 
+                      className="absolute inset-0 pointer-events-none rounded-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ 
+                        opacity: isFlipping ? 0.4 : 0,
+                      }}
+                      style={{
+                        background: isRightPage 
+                          ? 'linear-gradient(to left, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 10%, transparent 40%)'
+                          : 'linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 10%, transparent 40%)',
+                      }}
+                    />
+                    
+                    {/* Page edge highlight */}
+                    <motion.div
+                      className="absolute inset-y-0 w-1 pointer-events-none"
+                      style={{
+                        [isLeftPage ? 'right' : 'left']: 0,
+                        background: 'linear-gradient(to right, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: isFlipping ? 1 : 0.3 }}
+                    />
+                    
+                    {/* Page shadow effect */}
+                    {viewMode === 'double' && isLeftPage && (
+                      <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-black/10 to-transparent pointer-events-none" />
+                    )}
+                    {viewMode === 'double' && isRightPage && displayPages.length === 2 && (
+                      <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-black/15 to-transparent pointer-events-none" />
+                    )}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
 
             {/* Book spine effect (for double page view) */}

@@ -140,6 +140,46 @@
     transform: rotateY(180deg);
   }
 
+  /* Page curl container */
+  .page-curl-container {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+
+  /* Realistic page curl shadow */
+  .page-curl-shadow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to left,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0.15) 8%,
+      rgba(0, 0, 0, 0.05) 20%,
+      transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .page-curl-container:hover .page-curl-shadow {
+    opacity: 0.3;
+  }
+
+  /* Page edge shine effect */
+  .page-edge-shine {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+  }
+
   /* Controls fade */
   .controls-container {
     transition: opacity var(--duration-normal) var(--ease-out-expo);
@@ -252,23 +292,56 @@
 
 @keyframes pageFlipIn {
   0% {
-    transform: perspective(2000px) rotateY(-90deg);
+    transform: perspective(2000px) rotateY(-90deg) scale(0.95);
     opacity: 0;
+    filter: brightness(0.8);
+  }
+  50% {
+    filter: brightness(1.1);
   }
   100% {
-    transform: perspective(2000px) rotateY(0deg);
+    transform: perspective(2000px) rotateY(0deg) scale(1);
     opacity: 1;
+    filter: brightness(1);
   }
 }
 
 @keyframes pageFlipOut {
   0% {
-    transform: perspective(2000px) rotateY(0deg);
+    transform: perspective(2000px) rotateY(0deg) scale(1);
     opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.1);
   }
   100% {
-    transform: perspective(2000px) rotateY(90deg);
+    transform: perspective(2000px) rotateY(90deg) scale(0.95);
     opacity: 0;
+    filter: brightness(0.8);
+  }
+}
+
+@keyframes pageCurl {
+  0% {
+    transform: perspective(2000px) rotateY(0deg);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  25% {
+    transform: perspective(2000px) rotateY(-15deg) translateX(-5px);
+    box-shadow: 5px 0 20px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: perspective(2000px) rotateY(-45deg) translateX(-15px);
+    box-shadow: 15px 0 40px rgba(0, 0, 0, 0.3);
+  }
+  75% {
+    transform: perspective(2000px) rotateY(-120deg) translateX(-10px);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
+  }
+  100% {
+    transform: perspective(2000px) rotateY(-180deg) translateX(0);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
 }
 
