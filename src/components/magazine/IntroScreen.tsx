@@ -97,7 +97,7 @@ export function IntroScreen({
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               className="mb-10 text-sm font-light uppercase tracking-[0.3em] text-muted-foreground"
             >
-              {MAGAZINE_CONFIG.TAGLINE}
+              PRESENTS
             </motion.p>
           )}
         </AnimatePresence>
