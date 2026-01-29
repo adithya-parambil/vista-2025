@@ -132,7 +132,7 @@ export function IntroScreen({
               transition={{ delay: 1.2 }}
               className="text-xs font-light tracking-[0.35em] uppercase text-muted-foreground font-serif"
             >
-              {isDownloading ? 'Downloading' : 'Preparing'}
+              {isDownloading ? 'Loading' : 'Preparing'}
             </motion.p>
 
             <motion.p
