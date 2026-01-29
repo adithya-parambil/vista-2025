@@ -5,22 +5,21 @@
  */
 
 export const MAGAZINE_CONFIG = {
-  // PDF source - GitHub Releases URL
-  // Replace this URL when publishing a new edition
-  PDF_URL: 'https://github.com/nickklos10/nickklos10/releases/download/v1.0/magazine.pdf',
+  // PDF source - local file in public folder
+  PDF_URL: '/Vista.Anantam.pdf',
   
   // Logo path - stored in public folder
   LOGO_PATH: '/logo.png',
   
   // Branding
-  BRAND_NAME: 'Magazine',
+  BRAND_NAME: 'Vista Anantam',
   TAGLINE: 'presents',
   
   // Lazy loading configuration
   PRELOAD_COUNT: 5,           // Pages to preload during intro
-  LAZY_LOAD_WINDOW: 7,        // Pages to keep ahead of current page
+  LAZY_LOAD_WINDOW: 5,        // Pages to keep ahead of current page
   PAGES_BEHIND: 2,            // Pages to keep behind current page
-  MAX_CACHED_PAGES: 15,       // Maximum pages in memory
+  MAX_CACHED_PAGES: 12,       // Maximum pages in memory
   
   // Performance settings
   MOBILE_SCALE: 1.0,          // Page scale for mobile devices
