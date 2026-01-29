@@ -5,3 +5,4 @@ export { PageRenderer } from './PageRenderer';
 export { Controls } from './Controls';
 export { ErrorBoundary } from './ErrorBoundary';
 export { LoadingSpinner } from './LoadingSpinner';
+export { PageCurl, InteractivePageCurl } from './PageCurl';

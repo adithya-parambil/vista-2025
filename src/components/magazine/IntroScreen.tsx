@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MAGAZINE_CONFIG } from '@/config/magazine';
-import { useMagazineStore } from '@/store/magazineStore';
 
 interface IntroScreenProps {
   onComplete: () => void;
@@ -10,22 +9,24 @@ interface IntroScreenProps {
   isDownloading?: boolean;
 }
 
-export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownloading = false }: IntroScreenProps) {
+export function IntroScreen({
+  onComplete,
+  isReady,
+  downloadProgress = 0,
+  isDownloading = false,
+}: IntroScreenProps) {
   const [showText, setShowText] = useState(false);
   const [progress, setProgress] = useState(0);
   const [logoError, setLogoError] = useState(false);
 
   useEffect(() => {
-    // Show "presents" text after logo animation
     const textTimer = setTimeout(() => {
       setShowText(true);
     }, 800);
-
     return () => clearTimeout(textTimer);
   }, []);
 
   useEffect(() => {
-    // Simulate progress during PDF loading
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90 && !isReady) return prev;
@@ -38,7 +39,6 @@ export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownl
   }, [isReady]);
 
   useEffect(() => {
-    // Complete intro when ready and minimum time passed
     if (isReady && progress >= 100) {
       const timer = setTimeout(() => {
         onComplete();
@@ -47,8 +47,11 @@ export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownl
     }
   }, [isReady, progress, onComplete]);
 
-  // Use download progress for accurate display
-  const displayProgress = isDownloading ? downloadProgress : (isReady ? 100 : progress);
+  const displayProgress = isDownloading
+    ? downloadProgress
+    : isReady
+    ? 100
+    : progress;
 
   return (
     <motion.div
@@ -57,9 +60,9 @@ export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownl
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Subtle gradient overlay */}
+      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background to-background" />
-      
+
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center">
         {/* Logo */}
@@ -92,14 +95,14 @@ export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownl
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-12 text-sm font-light uppercase tracking-[0.3em] text-muted-foreground"
+              className="mb-10 text-sm font-light uppercase tracking-[0.3em] text-muted-foreground"
             >
               {MAGAZINE_CONFIG.TAGLINE}
             </motion.p>
           )}
         </AnimatePresence>
 
-        {/* Progress indicator */}
+        {/* Progress + Status */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -107,7 +110,7 @@ export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownl
           className="flex flex-col items-center"
         >
           {/* Progress bar */}
-          <div className="mb-4 h-0.5 w-48 overflow-hidden rounded-full bg-muted">
+          <div className="mb-6 h-0.5 w-48 overflow-hidden rounded-full bg-muted">
             <motion.div
               className="h-full bg-gradient-to-r from-primary/50 to-primary"
               initial={{ width: 0 }}
@@ -115,20 +118,45 @@ export function IntroScreen({ onComplete, isReady, downloadProgress = 0, isDownl
               transition={{ duration: 0.3, ease: 'easeOut' }}
             />
           </div>
-          
-          {/* Status text */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.6 }}
-            transition={{ delay: 1.2 }}
-            className="text-xs font-light tracking-wider text-muted-foreground"
+
+          {/* Editorial status text */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1, duration: 0.8, ease: 'easeOut' }}
+            className="flex flex-col items-center space-y-3 text-center"
           >
-            {isDownloading ? 'Downloading Magazine…' : 'Preparing the Magazine…'}
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.75 }}
+              transition={{ delay: 1.2 }}
+              className="text-xs font-light tracking-[0.35em] uppercase text-muted-foreground font-serif"
+            >
+              {isDownloading ? 'Downloading' : 'Preparing'}
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.35, duration: 0.6 }}
+              className="text-lg font-semibold tracking-[0.3em] uppercase text-foreground font-serif"
+            >
+              {MAGAZINE_CONFIG.BRAND_NAME}
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              transition={{ delay: 1.5 }}
+              className="text-xs font-light tracking-[0.45em] uppercase text-muted-foreground font-serif"
+            >
+              {MAGAZINE_CONFIG.TAGLINE}
+            </motion.p>
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Ambient glow effect */}
+      {/* Ambient glow */}
       <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl" />
     </motion.div>
   );
