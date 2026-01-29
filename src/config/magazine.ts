@@ -5,8 +5,8 @@
  */
 
 export const MAGAZINE_CONFIG = {
-  // PDF source - local file in public folder
-  PDF_URL: '/Vista.Anantam.pdf',
+  // PDF source - external URL
+  PDF_URL: 'https://vista-2025-nu.vercel.app/Vista.Anantam.pdf',
   
   // Logo path - stored in public folder
   LOGO_PATH: '/logo.png',
