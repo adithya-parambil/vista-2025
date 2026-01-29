@@ -12,8 +12,8 @@ export const MAGAZINE_CONFIG = {
   LOGO_PATH: '/logo.png',
   
   // Branding
-  BRAND_NAME: 'Vista Anantam',
-  TAGLINE: 'presents',
+  BRAND_NAME: 'Anantam',
+  TAGLINE: 'Expressions Beyond Time · Echoes Beyond Space',
   
   // Lazy loading configuration
   PRELOAD_COUNT: 5,           // Pages to preload during intro
