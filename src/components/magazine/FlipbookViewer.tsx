@@ -38,6 +38,7 @@ const FlipPage = forwardRef<HTMLDivElement, FlipPageProps>(
       isMobile,
       isTablet,
       markPageRendered,
+      currentPage, // Get current page for virtualization
     } = useMagazineStore();
 
     const effectivePdfUrl = cachedPdfUrl || pdfUrl;
@@ -47,6 +48,18 @@ const FlipPage = forwardRef<HTMLDivElement, FlipPageProps>(
       if (isTablet) return MAGAZINE_CONFIG.TABLET_SCALE;
       return MAGAZINE_CONFIG.DESKTOP_SCALE;
     }, [isMobile, isTablet]);
+
+    // Virtualization: Only render pages near the current page
+    // User requested ~4-7 pages ready. +/- 4 gives us a simplified range.
+    const renderWindow = isMobile ? 4 : 6;
+    const shouldRender = Math.abs(pageNumber - currentPage) <= renderWindow;
+
+    // Reset loaded state if we unmount
+    useEffect(() => {
+      if (!shouldRender) {
+        setIsLoaded(false);
+      }
+    }, [shouldRender]);
 
     useEffect(() => {
       if (!isLoaded) addLoadingPage(pageNumber);
@@ -110,24 +123,26 @@ const FlipPage = forwardRef<HTMLDivElement, FlipPageProps>(
           </div>
         )}
 
-        {/* PDF Page */}
-        <Document
-          file={effectivePdfUrl}
-          loading={null}
-          error={null}
-          onLoadError={(error) => handleLoadError(error as Error)}
-        >
-          <Page
-            pageNumber={pageNumber}
-            width={width}
-            scale={getScale()}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
+        {/* PDF Page - Virtualized */}
+        {shouldRender && (
+          <Document
+            file={effectivePdfUrl}
             loading={null}
-            onLoadSuccess={handleLoadSuccess}
-            onRenderError={(error) => handleLoadError(error as Error)}
-          />
-        </Document>
+            error={null}
+            onLoadError={(error) => handleLoadError(error as Error)}
+          >
+            <Page
+              pageNumber={pageNumber}
+              width={width}
+              scale={getScale()}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+              loading={null}
+              onLoadSuccess={handleLoadSuccess}
+              onRenderError={(error) => handleLoadError(error as Error)}
+            />
+          </Document>
+        )}
       </div>
     );
   }

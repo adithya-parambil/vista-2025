@@ -15,11 +15,11 @@ export const MAGAZINE_CONFIG = {
   BRAND_NAME: 'Anantam',
   TAGLINE: 'Expressions Beyond Time · Echoes Beyond Space',
 
-  // Lazy loading configuration (Aggressively reduced for stability)
-  PRELOAD_COUNT: 2,           // Pages to preload during intro
-  LAZY_LOAD_WINDOW: 2,        // Pages to keep ahead of current page
-  PAGES_BEHIND: 1,            // Pages to keep behind current page
-  MAX_CACHED_PAGES: 6,        // Maximum pages in memory (Reduced to prevent crashes)
+  // Lazy loading configuration (Adjusted for user request: ~4-7 pages ready)
+  PRELOAD_COUNT: 4,           // Pages to preload during intro
+  LAZY_LOAD_WINDOW: 4,        // Pages to keep ahead of current page
+  PAGES_BEHIND: 2,            // Pages to keep behind current page
+  MAX_CACHED_PAGES: 10,       // Maximum pages in memory (Increased to support larger window)
 
   // Performance settings
   MOBILE_SCALE: 0.6,          // Page scale for mobile devices (Highly optimized for stability)
