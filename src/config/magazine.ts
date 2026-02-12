@@ -22,7 +22,7 @@ export const MAGAZINE_CONFIG = {
   MAX_CACHED_PAGES: 8,        // Maximum pages in memory (Balanced for stability)
 
   // Performance settings
-  MOBILE_SCALE: 0.5,          // Page scale for mobile devices (High compression for stability)
+  MOBILE_SCALE: 0.6,          // Page scale for mobile devices (High compression for stability)
   DESKTOP_SCALE: 1.2,         // Page scale for desktop (Optimized)
   TABLET_SCALE: 1.0,          // Page scale for tablets (Optimized)
 

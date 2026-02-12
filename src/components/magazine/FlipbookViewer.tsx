@@ -138,7 +138,7 @@ const FlipPage = forwardRef<HTMLDivElement, FlipPageProps>(
             <Page
               pageNumber={pageNumber}
               width={width}
-              scale={getScale()}
+              // scale={getScale()} // Let width drive the size to fill container
               devicePixelRatio={pixelRatio} // Cap DPI to prevent OOM
               renderTextLayer={false}
               renderAnnotationLayer={false}
