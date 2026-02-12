@@ -37,9 +37,9 @@ export const PageCurl = memo(function PageCurl({
   // Calculate realistic flip animation with natural motion
   const getFlipAnimation = useMemo(() => {
     if (!isFlipping) {
-      return { 
-        rotateY: 0, 
-        x: 0, 
+      return {
+        rotateY: 0,
+        x: 0,
         scale: 1,
         rotateX: 0,
         z: 0,
@@ -50,44 +50,44 @@ export const PageCurl = memo(function PageCurl({
     const lift = 15; // Page lift during flip
 
     if (flipDirection === 'right') {
-      return side === 'left' 
-        ? { 
-            rotateY: 0, 
-            x: 0, 
-            scale: 1,
-            rotateX: 0,
-            z: 0,
-          }
-        : { 
-            rotateY: -180, 
-            x: -width * 0.25,
-            scale: 0.98,
-            rotateX: -3, // Slight tilt for realism
-            z: lift,
-          };
-    }
-    
-    return side === 'right'
-      ? { 
-          rotateY: 0, 
-          x: 0, 
+      return side === 'left'
+        ? {
+          rotateY: 0,
+          x: 0,
           scale: 1,
           rotateX: 0,
           z: 0,
         }
-      : { 
-          rotateY: 180, 
-          x: width * 0.25,
+        : {
+          rotateY: -180,
+          x: -width * 0.25,
           scale: 0.98,
-          rotateX: 3,
+          rotateX: -3, // Slight tilt for realism
           z: lift,
         };
+    }
+
+    return side === 'right'
+      ? {
+        rotateY: 0,
+        x: 0,
+        scale: 1,
+        rotateX: 0,
+        z: 0,
+      }
+      : {
+        rotateY: 180,
+        x: width * 0.25,
+        scale: 0.98,
+        rotateX: 3,
+        z: lift,
+      };
   }, [isFlipping, flipDirection, side, width]);
 
   // Draw realistic page curl on canvas
   useEffect(() => {
     if (!canvasRef.current || !isHovering) return;
-    
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -168,17 +168,17 @@ export const PageCurl = memo(function PageCurl({
         className="absolute inset-0"
         style={{
           backfaceVisibility: 'hidden',
-          background: isCover 
+          background: isCover
             ? 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)'
             : '#fefefe',
-          boxShadow: isFlipping 
-            ? '0 20px 60px rgba(0, 0, 0, 0.3)' 
+          boxShadow: isFlipping
+            ? '0 20px 60px rgba(0, 0, 0, 0.3)'
             : '0 4px 20px rgba(0, 0, 0, 0.1)',
           borderRadius: '2px',
         }}
       >
         {children}
-        
+
         {/* Realistic page texture overlay */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -196,7 +196,7 @@ export const PageCurl = memo(function PageCurl({
             opacity: isCover ? 0 : 0.3,
           }}
         />
-        
+
         {/* Dynamic shadow during flip - organic gradient */}
         {isFlipping && (
           <motion.div
@@ -322,13 +322,13 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
   // Spring physics for natural, bouncy movement
   const x = useMotionValue(0);
   const smoothX = useSpring(x, { stiffness: 100, damping: 25, mass: 0.5 });
-  
+
   // Natural transformations based on drag
   const rotateY = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [25, 0, -25]);
   const rotateX = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [-2, 0, 2]);
   const scale = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [0.96, 1, 0.96]);
   const z = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [10, 0, 10]);
-  
+
   // Dynamic shadows with organic gradients
   const shadowOpacity = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [0.4, 0, 0.4]);
   const shadowBlur = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [30, 10, 30]);
@@ -336,7 +336,7 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
   // Draw real-time page curl effect on canvas
   useAnimationFrame(() => {
     if (!canvasRef.current || !isDragging) return;
-    
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -387,16 +387,16 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
     const threshold = width * 0.25;
     const velocity = Math.abs(info.velocity.x);
     const distance = Math.abs(info.offset.x);
-    
+
     // Natural flip threshold considering both distance and velocity
     const shouldFlip = distance > threshold || (velocity > 500 && distance > threshold * 0.5);
-    
+
     if (info.offset.x < -threshold && canFlipNext && shouldFlip) {
       onFlipNext?.();
     } else if (info.offset.x > threshold && canFlipPrev && shouldFlip) {
       onFlipPrev?.();
     }
-    
+
     setIsDragging(false);
     setCurlIntensity(0);
   };
@@ -427,7 +427,7 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
       drag="x"
       dragConstraints={{ left: -width * 0.5, right: width * 0.5 }}
       dragElastic={0.15}
-      dragTransition={{ 
+      dragTransition={{
         power: 0.3,
         timeConstant: 200,
         bounceDamping: 20,
@@ -439,7 +439,7 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
       whileTap={{ cursor: 'grabbing', scale: 0.99 }}
     >
       {/* Main content */}
-      <div 
+      <div
         className="relative w-full h-full"
         style={{
           background: '#fefefe',
@@ -448,7 +448,7 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
         }}
       >
         {children}
-        
+
         {/* Paper texture */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -475,7 +475,7 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
           }}
         />
       </div>
-      
+
       {/* Real-time canvas curl effect */}
       <canvas
         ref={canvasRef}
@@ -486,7 +486,7 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
           borderRadius: '3px',
         }}
       />
-      
+
       {/* Dynamic shadow based on drag with organic gradient */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
@@ -526,3 +526,5 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
     </motion.div>
   );
 });
+
+export default PageCurl;

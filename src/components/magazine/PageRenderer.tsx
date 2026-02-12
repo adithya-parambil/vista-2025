@@ -5,8 +5,9 @@ import { useMagazineStore } from '@/store/magazineStore';
 import { MAGAZINE_CONFIG } from '@/config/magazine';
 import { LoadingSpinner } from './LoadingSpinner';
 
-// Configure PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Configure PDF.js worker - use local copy to avoid CORS issues
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 interface PageRendererProps {
   pageNumber: number;
@@ -29,13 +30,13 @@ export const PageRenderer = memo(function PageRenderer({
 }: PageRendererProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const { 
-    addCachedPage, 
-    addLoadingPage, 
-    removeLoadingPage, 
-    isMobile, 
-    isTablet, 
-    cachedPdfUrl, 
+  const {
+    addCachedPage,
+    addLoadingPage,
+    removeLoadingPage,
+    isMobile,
+    isTablet,
+    cachedPdfUrl,
     pdfUrl,
     markPageRendered,
     isPageRendered
@@ -84,9 +85,8 @@ export const PageRenderer = memo(function PageRenderer({
       initial={{ opacity: wasRendered ? 1 : 0 }}
       animate={{ opacity: isLoaded ? 1 : 0.5 }}
       transition={{ duration: wasRendered ? 0 : 0.3 }}
-      className={`relative overflow-hidden bg-magazine-page ${
-        isCover ? 'rounded-r-sm shadow-page' : 'rounded-sm shadow-page'
-      }`}
+      className={`relative overflow-hidden bg-magazine-page ${isCover ? 'rounded-r-sm shadow-page' : 'rounded-sm shadow-page'
+        }`}
       style={{ width, height: height || 'auto' }}
     >
       {/* Loading skeleton */}

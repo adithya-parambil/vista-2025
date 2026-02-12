@@ -11,14 +11,14 @@ export function Magazine() {
   const [showIntro, setShowIntro] = useState(true);
   const [introMinTimePassed, setIntroMinTimePassed] = useState(false);
 
-  const { 
+  const {
     completeIntro,
-    isIntroComplete 
+    isIntroComplete
   } = useMagazineStore();
 
   // Download and cache the PDF
   const { cachedUrl, isDownloading, downloadProgress, error: cacheError } = usePdfCache();
-  
+
   // PDF is ready when cached
   const pdfReady = !!cachedUrl;
 
@@ -69,3 +69,5 @@ export function Magazine() {
     </ErrorBoundary>
   );
 }
+
+export default Magazine;

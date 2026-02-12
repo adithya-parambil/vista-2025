@@ -1,8 +1,7 @@
-export { Magazine } from './Magazine';
-export { IntroScreen } from './IntroScreen';
-export { FlipbookViewer } from './FlipbookViewer';
-export { PageRenderer } from './PageRenderer';
-export { Controls } from './Controls';
-export { ErrorBoundary } from './ErrorBoundary';
-export { LoadingSpinner } from './LoadingSpinner';
-export { PageCurl, InteractivePageCurl } from './PageCurl';
+export { default as Magazine } from './Magazine';
+export { default as FlipbookViewer } from './FlipbookViewer';
+export { default as PageCurl } from './PageCurl';
+export { default as EnhancedPageCurl } from './EnhancedPageCurl';
+export { CurlPhysics } from './CurlPhysics';
+export { default as CurlMeshGenerator } from './CurlMeshGenerator';
+export * from './types/curl.types';

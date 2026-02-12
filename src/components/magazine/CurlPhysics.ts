@@ -1,72 +1,146 @@
-// Physics configuration interface
-interface PhysicsConfig {
-    mass: number; // mass of the curl page
-    damping: number; // damping factor for simulation
-    springConstant: number; // spring constant for spring dynamics
-    curlIntensity: number; // intensity of the curl effect
-}
+import { PhysicsConfig, CurlPoint } from './types/curl.types';
 
-class CurlPhysics {
+export class CurlPhysics {
+    private config: PhysicsConfig;
     private position: number;
     private velocity: number;
-    private isRest: boolean;
-    private config: PhysicsConfig;
+    private target: number;
+    private isInteracting: boolean;
+    private lastTime: number;
 
     constructor(config: PhysicsConfig) {
         this.config = config;
         this.position = 0;
         this.velocity = 0;
-        this.isRest = true;
+        this.target = 0;
+        this.isInteracting = false;
+        this.lastTime = 0;
     }
 
-    update(deltaTime: number): void {
-        if (!this.isAtRest()) {
-            // Apply spring dynamics
-            const springForce = -this.config.springConstant * this.position;
-            const dampingForce = -this.config.damping * this.velocity;
-            const acceleration = (springForce + dampingForce) / this.config.mass;
-            this.velocity += acceleration * deltaTime;
-            this.position += this.velocity * deltaTime;
+    /**
+     * Update physics state based on elapsed time
+     * Uses simple spring physics: F = -kx - cv
+     */
+    update(timestamp: number): number {
+        if (this.lastTime === 0) {
+            this.lastTime = timestamp;
+            return this.position;
         }
-    }
 
-    applyImpulse(impulse: number): void {
-        this.velocity += impulse / this.config.mass;
-        this.isRest = false;
-    }
+        const dt = Math.min((timestamp - this.lastTime) / 1000, 0.1); // Cap dt to avoid instability
+        this.lastTime = timestamp;
 
-    getPosition(): number {
+        if (this.isInteracting) {
+            // During interaction, physics follows the pointer with some lag (mass) or directly
+            // For now, we assume direct control during interaction for responsiveness,
+            // but we track velocity for release
+            return this.position;
+        }
+
+        // Spring force (Hooke's Law)
+        const displacement = this.position - this.target;
+        const springForce = -this.config.stiffness * displacement;
+
+        // Damping force
+        const dampingForce = -this.config.damping * this.velocity;
+
+        // Net force
+        const force = springForce + dampingForce;
+
+        // Acceleration (F = ma)
+        const acceleration = force / this.config.mass;
+
+        // Velocity update
+        this.velocity += acceleration * dt;
+
+        // Friction application (simplified)
+        if (Math.abs(this.velocity) > 0) {
+            this.velocity *= Math.max(0, 1 - (this.config.friction * dt));
+        }
+
+        // Velocity cap
+        if (Math.abs(this.velocity) > this.config.maxVelocity) {
+            this.velocity = Math.sign(this.velocity) * this.config.maxVelocity;
+        }
+
+        // Position update
+        this.position += this.velocity * dt;
+
+        // Snap to target if close enough and slow enough
+        if (Math.abs(displacement) < 0.001 && Math.abs(this.velocity) < 0.01) {
+            this.position = this.target;
+            this.velocity = 0;
+        }
+
         return this.position;
     }
 
-    getVelocity(): number {
-        return this.velocity;
+    /**
+     * Set the target position (0 = closed, 1 = open/flipped)
+     */
+    setTarget(target: number) {
+        this.target = Math.max(0, Math.min(1, target));
     }
 
-    reset(): void {
+    /**
+     * Set the current position directly (e.g. during drag)
+     */
+    setPosition(position: number) {
+        const newPos = Math.max(0, Math.min(1, position));
+        // Calculate velocity based on movement for "throw" effect
+        if (this.lastTime > 0) {
+            // Approximate velocity from instantaneous movement (simplified)
+            // In a real loop, we'd use moving average
+        }
+        this.position = newPos;
+        // When dragging, we are "at the target" effectively for the spring until release
+        this.target = newPos;
+    }
+
+    /**
+     * Start interaction (drag)
+     */
+    startInteraction() {
+        this.isInteracting = true;
+        this.velocity = 0;
+    }
+
+    /**
+     * End interaction (release)
+     */
+    endInteraction(releaseVelocity?: number) {
+        this.isInteracting = false;
+        if (releaseVelocity !== undefined) {
+            this.velocity = releaseVelocity;
+        }
+    }
+
+    /**
+     * Reset physics state
+     */
+    reset() {
         this.position = 0;
         this.velocity = 0;
-        this.isRest = true;
+        this.target = 0;
+        this.isInteracting = false;
+        this.lastTime = 0;
     }
 
-    isAtRest(): boolean {
-        return this.isRest && Math.abs(this.velocity) < 0.001;
+    /**
+     * Update configuration
+     */
+    setConfig(config: PhysicsConfig) {
+        this.config = config;
     }
 
-    // Easing function for smoother transitions
-    static easeInOut(t: number): number {
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-
-    // Spring equation for curl intensity
-    calculateCurlIntensity(): number {
-        return this.config.curlIntensity * this.position;
-    }
-
-    // Logic to determine if the flip is completed
-    isFlipCompleted(threshold: number): boolean {
-        return Math.abs(this.position) > threshold;
+    /**
+     * Get current state
+     */
+    getState() {
+        return {
+            position: this.position,
+            velocity: this.velocity,
+            isResting: Math.abs(this.velocity) < 0.001 && Math.abs(this.position - this.target) < 0.001
+        };
     }
 }
-
-export { PhysicsConfig, CurlPhysics };
