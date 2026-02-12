@@ -140,6 +140,7 @@ export const PageCurl = memo(function PageCurl({
         transformStyle: 'preserve-3d',
         transformOrigin: side === 'left' ? 'right center' : 'left center',
         perspective: 1500,
+        willChange: 'transform',
       }}
       initial={{ rotateY: 0, x: 0, scale: 1, rotateX: 0, z: 0 }}
       animate={getFlipAnimation}
@@ -194,6 +195,7 @@ export const PageCurl = memo(function PageCurl({
             `,
             mixBlendMode: 'multiply',
             opacity: isCover ? 0 : 0.3,
+            transform: 'translateZ(0)', // Force GPU layer
           }}
         />
 
