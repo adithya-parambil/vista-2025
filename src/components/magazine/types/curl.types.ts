@@ -1,32 +1,25 @@
 // curl.types.ts
 
-// Define the base interface for a page curl action
-export interface PageCurl {
-    curlDirection: 'left' | 'right';  // Direction of the page curl
-    curlAmount: number;               // Amount of curl (0 to 1)
-    duration: number;                 // Animation duration in milliseconds
+// Interface for configuration settings related to the page curl system
+export interface CurlConfig {
+    curlSpeed: number; // Speed of the curl motion
+    curlDirection: 'left' | 'right'; // Direction of the curl
+    curlIntensity: number; // Intensity of the curl effect
 }
 
-// Define an interface for the page that will have the curl effect
-export interface Page {
-    id: string;                       // Unique identifier for the page
-    content: string;                  // Content of the page
-    curlState: boolean;               // Whether the page is currently curled
-    curlProperties: PageCurl;         // Properties controlling the curl effect
+// Interface representing a point on the page being curled
+export interface CurlPoint {
+    x: number; // X coordinate
+    y: number; // Y coordinate
 }
 
-// Define a type for a collection of pages in a magazine
-export type Magazine = Page[]; 
-
-// Function to initiate curl on a page
-export function initiateCurl(page: Page, curlDirection: 'left' | 'right', curlAmount: number, duration: number): void {
-    // Logic to initiate page curl
-document.getElementById(page.id)?.classList.add(`curl-${curlDirection}`);
-    page.curlState = true;
+// Interface representing the state of the curl at any moment
+export interface CurlState {
+    isCurling: boolean; // Indicates if the page is currently curling
+    currentPoint: CurlPoint; // The current point being curled
+    curlProgress: number; // Progress of the curl between 0 and 1
+    config: CurlConfig; // Current configuration settings
 }
 
-// Function to complete the curl action
-export function completeCurl(page: Page): void {
-    // Logic to complete page curl
-    page.curlState = false;
-}
+// Exporting related types
+export type { CurlConfig, CurlPoint, CurlState };
