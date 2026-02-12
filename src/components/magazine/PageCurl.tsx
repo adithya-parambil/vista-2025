@@ -330,8 +330,7 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
   const z = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [10, 0, 10]);
 
   // Dynamic shadows with organic gradients
-  const shadowOpacity = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [0.4, 0, 0.4]);
-  const shadowBlur = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [30, 10, 30]);
+  const shadowOpacity = useTransform(smoothX, [-width * 0.5, 0, width * 0.5], [0.3, 0, 0.3]);
 
   // Draw real-time page curl effect on canvas
   useAnimationFrame(() => {
@@ -492,13 +491,13 @@ export const InteractivePageCurl = memo(function InteractivePageCurl({
         className="absolute inset-0 pointer-events-none"
         style={{
           opacity: shadowOpacity,
-          filter: `blur(${shadowBlur}px)`,
           background: `radial-gradient(ellipse at center, 
-            rgba(0,0,0,0.25) 0%, 
-            rgba(0,0,0,0.15) 30%,
-            rgba(0,0,0,0.08) 60%,
-            transparent 100%)`,
+            rgba(0,0,0,0.2) 0%, 
+            rgba(0,0,0,0.1) 40%,
+            transparent 70%)`,
           borderRadius: '3px',
+          // Optimizing performance: removed filter: blur()
+          willChange: 'opacity',
         }}
       />
 

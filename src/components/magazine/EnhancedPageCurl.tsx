@@ -78,6 +78,15 @@ export const EnhancedPageCurl = forwardRef<PageCurlHandle, EnhancedPageCurlProps
             return;
         }
 
+        const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap Max DPR at 2 for performance
+
+        // Handle resizing if needed
+        if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.scale(dpr, dpr);
+        }
+
         ctx.clearRect(0, 0, width, height);
 
         const pos = physics.update(performance.now());
@@ -134,8 +143,7 @@ export const EnhancedPageCurl = forwardRef<PageCurlHandle, EnhancedPageCurlProps
             const shadowW = 25 + 30 * progress;
             const shadowGrad = ctx.createLinearGradient(foldX - shadowW, 0, foldX, 0);
             shadowGrad.addColorStop(0, 'rgba(0,0,0,0)');
-            shadowGrad.addColorStop(0.7, 'rgba(0,0,0,0.08)');
-            shadowGrad.addColorStop(1, 'rgba(0,0,0,0.25)');
+            shadowGrad.addColorStop(1, 'rgba(0,0,0,0.2)');
             ctx.fillStyle = shadowGrad;
             ctx.fillRect(foldX - shadowW, 0, shadowW, height);
 
