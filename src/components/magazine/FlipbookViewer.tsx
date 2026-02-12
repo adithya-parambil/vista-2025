@@ -49,6 +49,10 @@ const FlipPage = forwardRef<HTMLDivElement, FlipPageProps>(
       return MAGAZINE_CONFIG.DESKTOP_SCALE;
     }, [isMobile, isTablet]);
 
+    // DPI Capping: High density screens (3x/4x) cause OOM on mobile.
+    // We cap the effective pixel ratio to 1.5 on mobile for stability.
+    const pixelRatio = isMobile ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio;
+
     // Virtualization: Only render pages near the current page
     // User requested ~4-7 pages ready. +/- 4 gives us a simplified range.
     const renderWindow = isMobile ? 4 : 6;
@@ -135,6 +139,7 @@ const FlipPage = forwardRef<HTMLDivElement, FlipPageProps>(
               pageNumber={pageNumber}
               width={width}
               scale={getScale()}
+              devicePixelRatio={pixelRatio} // Cap DPI to prevent OOM
               renderTextLayer={false}
               renderAnnotationLayer={false}
               loading={null}

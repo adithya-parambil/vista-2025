@@ -19,10 +19,10 @@ export const MAGAZINE_CONFIG = {
   PRELOAD_COUNT: 4,           // Pages to preload during intro
   LAZY_LOAD_WINDOW: 4,        // Pages to keep ahead of current page
   PAGES_BEHIND: 2,            // Pages to keep behind current page
-  MAX_CACHED_PAGES: 10,       // Maximum pages in memory (Increased to support larger window)
+  MAX_CACHED_PAGES: 8,        // Maximum pages in memory (Balanced for stability)
 
   // Performance settings
-  MOBILE_SCALE: 0.6,          // Page scale for mobile devices (Highly optimized for stability)
+  MOBILE_SCALE: 0.5,          // Page scale for mobile devices (High compression for stability)
   DESKTOP_SCALE: 1.2,         // Page scale for desktop (Optimized)
   TABLET_SCALE: 1.0,          // Page scale for tablets (Optimized)
 
